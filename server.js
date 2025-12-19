@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 const mongoose = require("mongoose")
 const dotenv = require("dotenv");
+const userRoute = require("./routes/user.js")
+const authRoute = require("./routes/auth.js")
 
 dotenv.config();
 
@@ -16,12 +18,9 @@ if (!mongoUrl) {
             process.exit(1);
         });
 }
-app.get("/api/test", (req, res) => {
-    console.log("test is successful");
-});
-
-
-
+app.use(express.json());
+app.use("/api/auth", authRoute);
+app.use("/api/user", userRoute);
 app.listen(process.env.PORT || 5000, () => {
     console.log("Backend server is running");
 });
