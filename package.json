@@ -19,6 +19,8 @@
         "crypto-js": "^4.2.0",
         "dotenv": "^17.2.3",
         "jsonwebtoken": "^9.0.3",
-        "mongoose": "^9.0.2"
+        "mongoose": "^9.0.2",
+        "react-stripe-checkout": "^2.6.3",
+        "stripe": "^20.1.0"
     }
 }

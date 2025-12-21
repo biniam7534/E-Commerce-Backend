@@ -2,37 +2,26 @@ const router = require("express").Router();
 const User = require("../model/User");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+
 // register
 router.post("/register", async(req, res) => {
-    const { username, email, password } = req.body || {};
-
-    if (!username || !email || !password) {
-        return res.status(400).json({ error: "username, email and password are required" });
-    }
-
-    // Hash password with bcrypt
-    let hashedPassword;
     try {
         const salt = await bcrypt.genSalt(10);
-        hashedPassword = await bcrypt.hash(password, salt);
-    } catch (err) {
-        console.error('Password hashing failed:', err);
-        return res.status(500).json({ error: 'Password hashing failed' });
-    }
+        const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
-    const newUser = new User({
-        username,
-        email,
-        password: hashedPassword,
-    });
+        const newUser = new User({
+            username: req.body.username,
+            email: req.body.email,
+            password: hashedPassword,
+        });
 
-    try {
         const savedUser = await newUser.save();
         res.status(201).json(savedUser);
     } catch (err) {
         res.status(500).json(err);
     }
 });
+
 // login
 router.post("/login", async(req, res) => {
     try {
@@ -46,11 +35,11 @@ router.post("/login", async(req, res) => {
                 id: user._id,
                 isAdmin: user.isAdmin,
             },
-            process.env.JWT_SEC, { expiresIn: "3d" });
+            process.env.JWT_SEC, { expiresIn: "3d" }
+        );
 
-        const userObj = user.toObject ? user.toObject() : user;
-        delete userObj.password;
-        res.status(200).json({...userObj, accessToken });
+        const { password, ...others } = user._doc;
+        res.status(200).json({...others, accessToken });
     } catch (err) {
         res.status(500).json(err);
     }
